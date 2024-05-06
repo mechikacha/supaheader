@@ -3,23 +3,43 @@
 from argparse import ArgumentParser
 import os
 
-header_size = (21, 1, 1, 1, 1, 1, 1, 1, 2, 2)
 HEADER_ADDRESS = 0x7fc0
+header_size = (21, 1, 1, 1, 1, 1, 1, 1, 2, 2)
+header_contents = []
+content_labels = [
+    'CARTRIDGE NAME',
+    'MAP MODE',
+    'CHIPSET',
+    'ROM SIZE',
+    'RAM SIZE',
+    'REGION',
+    'DEVELOPER ID',
+    'VERSION',
+    'CHECKSUM 1',
+    'CHECKSUM 2'
+   ]
 
 
-def open_rom(file):
+def main(file):
     rom = open(file, "rb")
     rom.seek(HEADER_ADDRESS)
     if file.endswith('.smc'):
         rom.seek(0x200, os.SEEK_CUR)
 
-    rom_name = rom.read(header_size[0]).decode("utf-8")
+    for size in header_size:
+        rom_info = rom.read(size)
+        header_contents.append(rom_info)
 
-    print('CARTRIDGE TITLE: ', rom_name)
+    for index, (content, label)\
+            in enumerate(zip(header_contents, content_labels)):
+        if index == 0:
+            print(label+':', str(content, 'utf-8'))
+        else:
+            print(label+':', content.hex())
 
 
 parser = ArgumentParser()
 parser.add_argument('ROM_FILE')
 rom_file = parser.parse_args().ROM_FILE
 
-open_rom(rom_file)
+main(rom_file)
