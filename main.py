@@ -2,11 +2,13 @@
 
 from argparse import ArgumentParser
 import os
+import hashlib
+
 
 HEADER_ADDRESS = 0x7fc0
-header_size = (21, 1, 1, 1, 1, 1, 1, 1, 2, 2)
-header_contents = []
-content_labels = [
+header_size: tuple[int] = (21, 1, 1, 1, 1, 1, 1, 1, 2, 2)
+header_contents: list[int] = []
+content_labels: list[str] = [
     'CARTRIDGE NAME',
     'MAP MODE',
     'CHIPSET',
@@ -16,14 +18,15 @@ content_labels = [
     'DEVELOPER ID',
     'VERSION',
     'CHECKSUM 1',
-    'CHECKSUM 2'
+    'CHECKSUM 2',
    ]
 
 
-def main(file):
-    rom = open(file, "rb")
+def main(file_path):
+    rom = open(file_path, "rb")
+    rdat = rom.read()
     rom.seek(HEADER_ADDRESS)
-    if file.endswith('.smc'):
+    if file_path.endswith('.smc'):
         rom.seek(0x200, os.SEEK_CUR)
 
     for size in header_size:
@@ -36,6 +39,9 @@ def main(file):
             print(label+':', str(content, 'utf-8'))
         else:
             print(label+':', content.hex())
+
+    hash_md5 = hashlib.md5(rdat).hexdigest()
+    print('MD5:', hash_md5)
 
 
 parser = ArgumentParser()
