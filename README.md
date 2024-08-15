@@ -1,4 +1,4 @@
-# shvcinfo
+# supaheader
 Show SNES cartridge information. Compatible with headered cartridge.
 
 ## Usage
